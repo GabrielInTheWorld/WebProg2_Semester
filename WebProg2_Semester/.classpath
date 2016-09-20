@@ -26,6 +26,5 @@
 	<classpathentry kind="lib" path="lib/servlet-api.jar"/>
 	<classpathentry kind="lib" path="lib/websocket-api.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jackson-core-asl-1.9.2.jar"/>
-	<classpathentry kind="lib" path="lib/javax.json-api-1.0.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

@@ -36,21 +36,25 @@
 		};
 		
 		webSocket.onmessage = function(message){
-			onMessage(event)
+			onMessage(message)
 		};
 		
 		document.getElementById('canvas').addEventListener("mousedown", mouseDown);
 		document.getElementById('canvas').addEventListener("mouseup", onDraw);
 		
 		function onMessage(message){
-			// document.getElementById('messages').innerHTML += '<br />' + event.data;
-			var jsonData = JSON.parse(message.data);
-			if(jsonData.message != null)
-				messagesTextArea.value += jsonData.message + "\n";
+			//document.getElementById('messagesTextArea').innerHTML += '<br/>' + message.data;
+			console.log(message, ": ", message.data);
+			var jsonData = JSON.parse(message);
+			console.log(jsonData);
+			if(message != null)
+				messagesTextArea.value += message + "\n";
+			else
+				console.log("message is empty");
 		}
 		
 		function onOpen(event){
-			document.getElementById('messages').innerHTML = 'Now connection established';
+			document.getElementById('messagesTextArea').innerHTML = 'Now connection established\n';
 		}
 		
 		function onError(event){
@@ -100,7 +104,6 @@
 			webSocket.send(text);
 			
 			userinput.value = "";
-			return false;
 		}
 	</script>
 </body>

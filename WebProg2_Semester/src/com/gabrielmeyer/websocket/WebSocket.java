@@ -1,46 +1,72 @@
 package com.gabrielmeyer.websocket;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonWriter;
+import javax.websocket.EncodeException;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-@ServerEndpoint("/websocket")
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+
+import com.gabrielmeyer.decoder.MessageDecoder;
+import com.gabrielmeyer.encoder.MessageEncoder;
+
+@ServerEndpoint(value = "/websocket", encoders = { MessageEncoder.class }, decoders = { MessageDecoder.class })
 public class WebSocket {
+
+	public class TextNode {
+		String username, message;
+
+		public TextNode(String username, String message) {
+			this.username = username;
+			this.message = message;
+		}
+
+		public void setUsername(String username) {
+			this.username = username;
+		}
+
+		public String getUsername() {
+			return username;
+		}
+
+		public void setMesssage(String message) {
+			this.message = message;
+		}
+
+		public String getMessage() {
+			return message;
+		}
+
+		public String asText() {
+			return "{\"username\" : \"" + username + "\", \"message\" : \"" + message + "\"}";
+		}
+	}
 
 	static Set<Session> users = Collections.synchronizedSet(new HashSet<Session>());
 
 	@OnMessage
-	public void onMessage(String message, Session session) throws InterruptedException, IOException {
+	public void onMessage(String message, Session session) throws InterruptedException, IOException, EncodeException {
 		System.out.println("User input: " + message);
-		session.getBasicRemote().sendText("Hello world Mr. " + message);
-		Thread.sleep(100);
 
 		String username = (String) session.getUserProperties().get("username");
 		if (username == null) {
 			session.getUserProperties().put("username", message);
-			session.getBasicRemote().sendText(buildJsonData("System", "you are now connected as " + message));
+			session.getBasicRemote().sendObject(buildJsonData("System", "you are now connected as " + message));
 		} else {
 			Iterator<Session> iterator = users.iterator();
 			while (iterator.hasNext()) {
-				iterator.next().getBasicRemote().sendText(buildJsonData(username, message));
+				iterator.next().getBasicRemote().sendObject(buildJsonData(username, message));
 			}
 		}
-		// for (int i = 0; i <= 25; ++i) {
-		// session.getBasicRemote().sendText(i + " Message from ...");
-		// Thread.sleep(1000);
-		// }
 	}
 
 	@OnOpen
@@ -55,16 +81,20 @@ public class WebSocket {
 		users.remove(session);
 	}
 
-	private String buildJsonData(String username, String message) {
-		JsonObject json = Json.createObjectBuilder().add("message", username + ": " + message).build();
-		StringWriter writer = new StringWriter();
-		try (JsonWriter jsonWriter = Json.createWriter(writer)) {
-			jsonWriter.write(json);
-			return writer.toString();
-		} catch (Exception e) {
+	private Object buildJsonData(String username, String message) {
+		ObjectMapper mapper = new ObjectMapper();
+
+		TextNode node = new TextNode(username, message);
+		JsonNode json = null;
+		try {
+			json = mapper.valueToTree(node);
+			System.out.println("json: " + json);
+
+		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		}
-		return null;
+		return json;
+
 	}
 
 }
