@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	<title>WebProg II Semesteraufgabe</title>
+</head>
+
+<body>
+
+	<div class="canvasDiv">
+		<canvas class="center" id="canvas"></canvas>
+	</div>
+
+	<div>
+		<input type="text" id="userinput" /> <br> <input type="submit" value="Send message to server" onclick="start()" />
+	</div>
+	<div class="chat">
+		<textArea id="messagesTextArea" readonly="readonly" rows="10" cols="45">
+		</textArea><br/>
+	</div> 
+
+	<script type="text/javascript">
+		var x, y;
+		var x2, y2;
+		var webSocket = new WebSocket(
+			'ws://localhost:8080/WebProg2_Semester/websocket'		
+		);
+		
+		webSocket.onerror = function(event){
+			onError(event)
+		};
+		
+		webSocket.onopen = function(event){
+			onOpen(event)
+		};
+		
+		webSocket.onmessage = function(message){
+			onMessage(event)
+		};
+		
+		document.getElementById('canvas').addEventListener("mousedown", mouseDown);
+		document.getElementById('canvas').addEventListener("mouseup", onDraw);
+		
+		function onMessage(message){
+			// document.getElementById('messages').innerHTML += '<br />' + event.data;
+			var jsonData = JSON.parse(message.data);
+			if(jsonData.message != null)
+				messagesTextArea.value += jsonData.message + "\n";
+		}
+		
+		function onOpen(event){
+			document.getElementById('messages').innerHTML = 'Now connection established';
+		}
+		
+		function onError(event){
+			alert(event.data);
+		}
+		
+		function mouseDown(event){
+			x = event.clientX;
+			y = event.clientY;
+			console.log("x: ", x);
+		}
+		
+		function onDraw(event){
+			var canvas = document.getElementById('canvas');
+			x2 = event.clientX;
+			y2 = event.clientY;
+			if(canvas.getContext){
+				var context = canvas.getContext('2d');
+				
+				var startX, startY;
+				var width, height;
+				if(x > x2){
+					startX = x2;
+					width = x - x2;
+				}else{
+					startX = x;
+					width = x2 - x;
+				}
+				
+				if(y > y2){
+					startY = y2;
+					height = y - y2;
+				}else{
+					startY = y;
+					height = y2 - y;
+				}
+				
+				console.log("startX: ", startX);
+				console.log("width: ", width);
+				context.strokeRect(startX, startY, width, height);
+				
+			}
+		}
+		
+		function start(){
+			var text = document.getElementById("userinput").value;
+			webSocket.send(text);
+			
+			userinput.value = "";
+			return false;
+		}
+	</script>
+</body>
+</html>

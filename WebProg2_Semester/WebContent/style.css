@@ -1,0 +1,28 @@
+@CHARSET "ISO-8859-1";
+
+body{
+	position: relative;
+}
+
+#canvas{
+	position: relative;
+}
+
+.center{
+	margin: auto;
+	width: 70%;
+	border: 3px solid green;
+	padding: 10px;
+}
+
+#userinput{
+	border: 1px solid #000;
+}
+
+.chat{
+	width: 12%; 
+	height: 50%; 
+	overflow: auto
+	float: left;
+	position: relative;
+}
