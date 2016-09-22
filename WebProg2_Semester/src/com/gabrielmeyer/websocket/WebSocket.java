@@ -14,20 +14,31 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import com.gabrielmeyer.decoder.MessageDecoder;
 import com.gabrielmeyer.encoder.MessageEncoder;
+import com.gabrielmeyer.encoder.NodeEncoder;
 
-@ServerEndpoint(value = "/websocket", encoders = { MessageEncoder.class }, decoders = { MessageDecoder.class })
+@ServerEndpoint(value = "/websocket", encoders = { MessageEncoder.class, NodeEncoder.class }, decoders = {
+		MessageDecoder.class })
 public class WebSocket {
 
-	public class TextNode {
-		String username, message;
+	public static class TextNode {
+		private String username, message, imageURL;
 
-		public TextNode(String username, String message) {
+		public TextNode() {
+
+		}
+
+		@JsonCreator
+		public TextNode(@JsonProperty("username") String username, @JsonProperty("message") String message,
+				@JsonProperty("imageURL") String imageURL) {
 			this.username = username;
 			this.message = message;
+			this.imageURL = imageURL;
 		}
 
 		public void setUsername(String username) {
@@ -46,6 +57,14 @@ public class WebSocket {
 			return message;
 		}
 
+		public void setImageURL(String imageURL) {
+			this.imageURL = imageURL;
+		}
+
+		public String getImageURL() {
+			return imageURL;
+		}
+
 		public String asText() {
 			return "{\"username\" : \"" + username + "\", \"message\" : \"" + message + "\"}";
 		}
@@ -56,15 +75,29 @@ public class WebSocket {
 	@OnMessage
 	public void onMessage(String message, Session session) throws InterruptedException, IOException, EncodeException {
 		System.out.println("User input: " + message);
+		ObjectMapper mapper = new ObjectMapper();
+		TextNode textNode = mapper.readValue(message, TextNode.class);
 
-		String username = (String) session.getUserProperties().get("username");
+		String username = textNode.getUsername();
+
+		if (username == null)
+			username = (String) session.getUserProperties().get("username");
+
 		if (username == null) {
-			session.getUserProperties().put("username", message);
-			session.getBasicRemote().sendObject(buildJsonData("System", "you are now connected as " + message));
+			session.getUserProperties().put("username", textNode.getUsername());
+			session.getBasicRemote()
+					.sendObject(buildJsonData("System", "you are now connected as " + textNode.getUsername(), null));
+			username = textNode.getUsername();
+			Iterator<Session> iterator = users.iterator();
+			while (iterator.hasNext()) {
+				iterator.next().getBasicRemote()
+						.sendObject(buildJsonData(username, textNode.getMessage(), textNode.getImageURL()));
+			}
 		} else {
 			Iterator<Session> iterator = users.iterator();
 			while (iterator.hasNext()) {
-				iterator.next().getBasicRemote().sendObject(buildJsonData(username, message));
+				iterator.next().getBasicRemote()
+						.sendObject(buildJsonData(username, textNode.getMessage(), textNode.getImageURL()));
 			}
 		}
 	}
@@ -81,10 +114,10 @@ public class WebSocket {
 		users.remove(session);
 	}
 
-	private Object buildJsonData(String username, String message) {
+	private Object buildJsonData(String username, String message, String imageURL) {
 		ObjectMapper mapper = new ObjectMapper();
 
-		TextNode node = new TextNode(username, message);
+		TextNode node = new TextNode(username, message, imageURL);
 		JsonNode json = null;
 		try {
 			json = mapper.valueToTree(node);

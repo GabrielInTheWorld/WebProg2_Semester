@@ -1,0 +1,212 @@
+div.container {
+	width: 100%;
+	min-width: 1000px;
+	margin: 0px;
+	padding: 0px;
+	border: 1px solid gray;
+}
+
+button {
+    display: inline-block;
+    vertical-align: top;
+}
+
+#history>div{
+	width: 100%;
+	margin: 3px;
+	padding: 5px;
+}
+
+div.deActiveDiv{
+	border: 1px solid gray;
+	background-color: white;
+}
+
+div.animatedDiv{
+	border: 1px solid gray;
+	background-color: #80ff00;
+}
+
+div.activeDiv{
+	border: 2px solid gray;
+	box-shadow: 5px 5px 5px #888888;
+}
+
+#lineColorPicker {
+	background-color: white;
+    background-size: 60px 40px;
+    height: 44px;  
+    width: 64px;
+}
+
+#fillColorPicker{
+	background-color: white;
+    background-size: 60px 40px;
+    height: 44px;  
+    width: 64px;
+}
+
+#animate_selected {
+    background-image: url( '../images/play.png' );
+    background-size: 60px 40px;
+    height: 44px;  
+    width: 64px;
+}
+
+#animate_selected:DISABLED {
+	background-image: url( '../images/play_disabled.png' );
+}
+
+#stop_animate_selected {
+    background-image: url( '../images/stop.png' );
+    background-size: 60px 40px;
+    height: 44px;  
+    width: 64px;
+}
+
+
+#stop_animate_selected:DISABLED {
+	background-image: url( '../images/stop_disabled.png' );
+}
+
+
+#delete_after {
+    background-image: url( '../images/deleteunder.png' );
+    background-size: 60px 40px;
+    height: 44px;  
+    width: 64px;
+}
+
+#delete_before {
+    background-image: url( '../images/deleteupper.png' );
+    background-size: 60px 40px;
+    height: 44px;  
+    width: 64px;
+}
+
+#delete_single {
+    background-image: url( '../images/delete.png' );
+    background-size: 60px 40px;
+    height: 44px;  
+    width: 64px;
+}
+
+#lineTool {
+    background-image: url( '../images/line.png' );
+    background-size: 60px 40px;
+    height: 44px;  
+    width: 64px;
+}
+
+#circleTool {
+    background-image: url( '../images/circle.png' );
+    background-size: 60px 40px;
+    height: 44px;  
+    width: 64px;
+}
+
+#rectangleTool {
+    background-image: url( '../images/rectangle.png' );
+    background-size: 60px 40px;
+    height: 44px;  
+    width: 64px;
+}
+
+#polygonTool {
+    background-image: url( '../images/polygon.png' );
+    background-size: 60px 40px;
+    height: 44px;  
+    width: 64px;
+}
+
+header, footer {
+	padding: 1em;
+	color: white;
+	height: 40px;
+	background-color: black;
+	clear: left;
+	text-align: center;
+}
+
+#middleArea {
+	height: 800px;
+	max-height: 800px;
+	width: 100%;
+	margin: 0px;
+	padding: 0px;
+	display: flex;
+	flex-flow: row;
+}
+
+#middleArea>div.toolArea {
+	margin: 0px;
+	padding: 1em;
+	width: 65px;
+	order: 1;
+}
+
+#middleArea>div.historyArea {
+	margin: 0px;
+	padding: 2px;
+	min-width: 80px;
+	flex: 1 15%;
+	order: 3;
+	border-left: 1px solid gray;
+}
+
+#history {
+	overflow: auto;
+	height: 750px;
+}
+
+#middleArea>div.midArea {
+	margin: 0px;
+	padding: 0px;
+	border-left: 1px solid gray;
+	overflow: hidden;
+	flex: none;
+	order: 2;
+}
+
+#canvasArea {
+	heigth: 600px;
+	width: 800px;
+	position: relative;
+}
+
+#previewCanvas {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+}
+
+#usermsg{
+	width: 570px;
+}
+
+#username{
+	width: 100px;
+}
+
+#usermsgbtn{
+	width: 100px;
+}
+
+#messages{
+	height: 84%;
+	width: 800px;
+	border-bottom: 1px solid gray;
+	overflow-y: scroll;
+}
+
+div.textAndButton{
+	display: inline-block;
+	width: 800px;
+	heigth: 16%;
+}
+
+div.chatArea {
+	border-top: 1px solid gray;
+	height: 200px;
+	width: 100%;
+}

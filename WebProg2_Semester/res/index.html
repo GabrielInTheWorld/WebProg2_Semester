@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="./css/layout.css">
+<script type="text/javascript" src="./javascript/drawing.js"></script>
+<meta charset="ISO-8859-1">
+<title>Webprog 2 DrawingApp</title>
+</head>
+<body onload="init()">
+	<div class="container">
+		<header>
+			<p>Webprog 2 DrawingApp</p>
+		</header>
+		<div id="middleArea">
+			<div class="toolArea">
+				<button id="lineTool" onclick="selectTool('LINE')"></button>
+				<button id="circleTool" onclick="selectTool('CIRCLE')"></button>
+				<button id="rectangleTool" onclick="selectTool('RECTANGLE')"></button>
+				<button id="polygonTool" onclick="selectTool('POLYGON')"></button>
+				<div>Color:</div>
+				<input type="color" id="lineColorPicker" value="#000000" />
+				<div>
+					Fill:
+					<input type="checkbox" id="useFillColor">
+				</div>
+				<input type="color" id="fillColorPicker" value="#000000" />
+				<button id="imageSaveBtn" onclick="saveImage()">Save image</button>
+			</div>
+
+			<div class="midArea">
+				<div id="canvasArea">
+					<canvas id="canvas" width="800" height="600">Canvas is not supported in your browser</canvas>
+				</div>
+				
+				<div class="chatArea">
+					<div id="messages"></div>
+					<div class="textAndButton">
+						<input type="text" id="usermsg" onkeyup="onKeyPressed(event)" />
+						<input type="text" id="username" value="User" readonly/>
+						<input id="usermsgbtn" class="chatButton" type="submit" value="Send" onclick="send()" />
+					</div>
+				</div>
+			</div>
+
+			<div class="historyArea">
+				<div id="historyButtons">
+					<button id="delete_single" onclick="deleteSelected('SINGLE')"></button>
+					<button id="delete_before" onclick="deleteSelected('ALL_BEFORE')"></button>
+					<button id="delete_after" onclick="deleteSelected('ALL_AFTER')"></button>
+					<button id="animate_selected" onclick="animateSelected()" disabled></button>
+					<button id="stop_animate_selected" onclick="stopAnimateSelected()" disabled></button>
+					<button id="saveHistory" onclick="saveHistory()">Save history</button>
+				</div>
+				<div id="history"></div>
+			</div>
+		</div>
+		
+		<footer>
+			<p>Hochschule Bremerhaven - Abschlussaufgabe von Kai Hartel &amp; Stephan Mävers</p>
+		</footer>
+	</div>
+</body>
+</html>

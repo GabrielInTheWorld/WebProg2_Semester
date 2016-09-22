@@ -28,6 +28,7 @@ public class MessageDecoder implements Text<TextNode> {
 	public TextNode decode(String jsonMessage) throws DecodeException {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
+			System.out.println("json: " + jsonMessage);
 			return mapper.readValue(jsonMessage, TextNode.class);
 		} catch (JsonParseException e) {
 			e.printStackTrace();
