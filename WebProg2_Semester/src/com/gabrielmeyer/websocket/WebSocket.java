@@ -11,19 +11,16 @@ import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
-import com.gabrielmeyer.decoder.MessageDecoder;
-import com.gabrielmeyer.encoder.MessageEncoder;
-import com.gabrielmeyer.encoder.NodeEncoder;
-
-@ServerEndpoint(value = "/websocket", encoders = { MessageEncoder.class, NodeEncoder.class }, decoders = {
-		MessageDecoder.class })
+//@ServerEndpoint(value = "/websocket", encoders = { MessageEncoder.class, NodeEncoder.class }, decoders = {
+//		MessageDecoder.class })
 public class WebSocket {
 
 	public static class TextNode {
@@ -74,6 +71,11 @@ public class WebSocket {
 
 	@OnMessage
 	public void onMessage(String message, Session session) throws InterruptedException, IOException, EncodeException {
+		try {
+			JSONObject json = new JSONObject(message);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 		System.out.println("User input: " + message);
 		ObjectMapper mapper = new ObjectMapper();
 		TextNode textNode = mapper.readValue(message, TextNode.class);
@@ -129,5 +131,25 @@ public class WebSocket {
 		return json;
 
 	}
+
+	// @Override
+	// public void onOpen(final Session session, EndpointConfig config) {
+	// session.addMessageHandler(new MessageHandler.Whole<String>() {
+	//
+	// @Override
+	// public void onMessage(String text) {
+	// System.out.println("Received response in client from endpoint: " + text);
+	// }
+	//
+	// });
+	//
+	// try {
+	// String name = "Duke";
+	// System.out.println("Sending message from client -> endpoint: " + name);
+	// session.getBasicRemote().sendText(name);
+	// } catch (IOException e) {
+	// e.printStackTrace();
+	// }
+	// }
 
 }

@@ -3,7 +3,7 @@ package com.gabrielmeyer.decoder;
 import java.io.IOException;
 
 import javax.websocket.DecodeException;
-import javax.websocket.Decoder.Text;
+import javax.websocket.Decoder;
 import javax.websocket.EndpointConfig;
 
 import org.codehaus.jackson.JsonParseException;
@@ -12,7 +12,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import com.gabrielmeyer.websocket.WebSocket.TextNode;
 
-public class MessageDecoder implements Text<TextNode> {
+public class MessageDecoder implements Decoder.Text<TextNode> {
 
 	@Override
 	public void destroy() {

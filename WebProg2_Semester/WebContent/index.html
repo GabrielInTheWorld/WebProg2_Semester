@@ -253,11 +253,15 @@
 			var jsonData = JSON.parse(message.data);
 			console.log(jsonData);
 			if(jsonData != null){
+				if(jsonData.type == "canvas"){
+					
+				}else if(jsonData.type == "chat"){
 				//messagesTextArea.value += jsonData.username + ": " + jsonData.message + "\n";
 				//messagesTextArea.value += "<img src=\"" + jsonData.imageURL + "\" width=\"100\" height=\"100\" />\n";	
-				document.getElementById("chatBox").innerHTML +=  jsonData.username + ": " + jsonData.message + "<br />";
-				if(jsonData.imageURL != null)
-					document.getElementById("chatBox").innerHTML += "<img src=\"" + jsonData.imageURL + "\" width=\"100\" height=\"100\" /><br />";
+					document.getElementById("chatBox").innerHTML +=  jsonData.username + ": " + jsonData.message + "<br />";
+					if(jsonData.imageURL != null)
+						document.getElementById("chatBox").innerHTML += "<img src=\"" + jsonData.imageURL + "\" width=\"100\" height=\"100\" /><br />";
+				}
 			}else
 				console.log("message is empty");
 		}
@@ -373,9 +377,14 @@
 			var text = document.getElementById("userinput").value;
 			var dataURL = canvasChat.toDataURL();
 			//var message = "{\"username\":" + "\"" + user + "\",\"message\":\"" + text + "\"}";
-			var message = JSON.stringify({"username":user, "message":text, "imageURL":dataURL}, null, "\t");
+			var content = JSON.stringify({"username":user, "message":text, "imageURL":dataURL}, null, "\t");
+			//var content = JSON.parse()
+			//var message = JSON.stringify({"type":"chat","username":user, "message":text, "imageURL":dataURL}, null, "\t");
+			var c = JSON.parse(content);
+			var message = JSON.stringify({"type":"chat", "content":c}, null, "\t");
 			webSocket.send(message);
 			
+			console.log("message: ", message);
 			userinput.value = "";
 			dataURL = null;
 			onClearChat(canvasChat.width, canvasChat.height, contextChat);
