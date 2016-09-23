@@ -8,9 +8,20 @@ import javax.servlet.ServletContextListener;
 import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 
+import com.gabrielmeyer.decoder.CircleDecoder;
+import com.gabrielmeyer.decoder.FreeHandDecoder;
+import com.gabrielmeyer.decoder.LineDecoder;
 import com.gabrielmeyer.decoder.MessageDecoder;
+import com.gabrielmeyer.decoder.PolygonDecoder;
+import com.gabrielmeyer.decoder.RectangleDecoder;
+import com.gabrielmeyer.encoder.CircleEncoder;
+import com.gabrielmeyer.encoder.FreeHandEncoder;
+import com.gabrielmeyer.encoder.LineEncoder;
 import com.gabrielmeyer.encoder.MessageEncoder;
 import com.gabrielmeyer.encoder.NodeEncoder;
+import com.gabrielmeyer.encoder.PolygonEncoder;
+import com.gabrielmeyer.encoder.RectangleEncoder;
+import com.gabrielmeyer.encoder.TextNodeEncoder;
 
 public class StartUpListener implements ServletContextListener {
 
@@ -29,8 +40,23 @@ public class StartUpListener implements ServletContextListener {
 
 		try {
 			ServerEndpointConfig config = ServerEndpointConfig.Builder.create(WebSocket.class, uri)
-					.decoders(Arrays.asList(MessageDecoder.class))
-					.encoders(Arrays.asList(MessageEncoder.class, NodeEncoder.class)).build();
+					.decoders(Arrays.asList( //
+							MessageDecoder.class, //
+							LineDecoder.class, //
+							RectangleDecoder.class, //
+							CircleDecoder.class, //
+							PolygonDecoder.class, //
+							FreeHandDecoder.class))
+					.encoders(Arrays.asList( //
+							MessageEncoder.class, //
+							LineEncoder.class, //
+							RectangleEncoder.class, //
+							CircleEncoder.class, //
+							PolygonEncoder.class, //
+							FreeHandEncoder.class, //
+							TextNodeEncoder.class, //
+							NodeEncoder.class))
+					.build();
 
 			container.addEndpoint(config);
 		} catch (Exception e) {

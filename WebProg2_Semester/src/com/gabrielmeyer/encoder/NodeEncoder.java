@@ -13,12 +13,12 @@ public class NodeEncoder implements Encoder.Text<ObjectNode> {
 
 	@Override
 	public void destroy() {
-		System.out.println("destroy-method");
+		System.out.println("NodeEncoder - destroy-method");
 	}
 
 	@Override
 	public void init(EndpointConfig arg0) {
-		System.out.println("init-method");
+		System.out.println("NodeEncoder - init-method");
 	}
 
 	@Override
@@ -27,6 +27,7 @@ public class NodeEncoder implements Encoder.Text<ObjectNode> {
 		try {
 			return mapper.writeValueAsString(node);
 		} catch (IOException e) {
+			System.out.println("Exception in NodeEncoder");
 			e.printStackTrace();
 		}
 

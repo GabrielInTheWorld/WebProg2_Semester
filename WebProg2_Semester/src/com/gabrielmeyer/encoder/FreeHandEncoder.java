@@ -6,28 +6,28 @@ import javax.websocket.EndpointConfig;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
-import com.gabrielmeyer.websocket.WebSocket.MessageNode;
+import com.gabrielmeyer.websocket.WebSocket.FreeHand;
 
-public class MessageEncoder implements Encoder.Text<MessageNode> {
+public class FreeHandEncoder implements Encoder.Text<FreeHand> {
 
 	@Override
 	public void destroy() {
-		System.out.println("MessageEncoder - destroy method called");
+		System.out.println("FreeHandEncoder - destroy-method");
 	}
 
 	@Override
-	public void init(EndpointConfig config) {
-		System.out.println("MessageEncoder - init method called");
+	public void init(EndpointConfig arg0) {
+		System.out.println("FreeHandEncoder - init-method");
 	}
 
 	@Override
-	public String encode(MessageNode text) throws EncodeException {
+	public String encode(FreeHand freeHand) throws EncodeException {
 		System.out.println("MessageEncoder");
 		ObjectMapper mapper = new ObjectMapper();
 		String json = null;
 
 		try {
-			json = mapper.writeValueAsString(text);
+			json = mapper.writeValueAsString(freeHand);
 		} catch (Exception e) {
 			System.out.println("Exception in MessageEncoder");
 			e.printStackTrace();

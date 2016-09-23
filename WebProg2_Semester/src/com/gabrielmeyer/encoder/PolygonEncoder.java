@@ -6,28 +6,28 @@ import javax.websocket.EndpointConfig;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
-import com.gabrielmeyer.websocket.WebSocket.MessageNode;
+import com.gabrielmeyer.websocket.WebSocket.Polygon;
 
-public class MessageEncoder implements Encoder.Text<MessageNode> {
+public class PolygonEncoder implements Encoder.Text<Polygon> {
 
 	@Override
 	public void destroy() {
-		System.out.println("MessageEncoder - destroy method called");
+		System.out.println("PolygonEncoder - destroy-method");
 	}
 
 	@Override
-	public void init(EndpointConfig config) {
-		System.out.println("MessageEncoder - init method called");
+	public void init(EndpointConfig arg0) {
+		System.out.println("PolygonEncoder - init-method");
 	}
 
 	@Override
-	public String encode(MessageNode text) throws EncodeException {
+	public String encode(Polygon polygon) throws EncodeException {
 		System.out.println("MessageEncoder");
 		ObjectMapper mapper = new ObjectMapper();
 		String json = null;
 
 		try {
-			json = mapper.writeValueAsString(text);
+			json = mapper.writeValueAsString(polygon);
 		} catch (Exception e) {
 			System.out.println("Exception in MessageEncoder");
 			e.printStackTrace();

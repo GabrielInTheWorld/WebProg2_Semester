@@ -10,9 +10,9 @@ import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
-import com.gabrielmeyer.websocket.WebSocket.TextNode;
+import com.gabrielmeyer.websocket.WebSocket.MessageNode;
 
-public class MessageDecoder implements Decoder.Text<TextNode> {
+public class MessageDecoder implements Decoder.Text<MessageNode> {
 
 	@Override
 	public void destroy() {
@@ -25,11 +25,11 @@ public class MessageDecoder implements Decoder.Text<TextNode> {
 	}
 
 	@Override
-	public TextNode decode(String jsonMessage) throws DecodeException {
+	public MessageNode decode(String jsonMessage) throws DecodeException {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			System.out.println("json: " + jsonMessage);
-			return mapper.readValue(jsonMessage, TextNode.class);
+			return mapper.readValue(jsonMessage, MessageNode.class);
 		} catch (JsonParseException e) {
 			e.printStackTrace();
 		} catch (JsonMappingException e) {

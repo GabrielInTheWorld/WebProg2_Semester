@@ -87,14 +87,14 @@
 		document.getElementById('canvasImg').src = dataURL;
 	}
 	
-	function writeMessage(type, x, y, bounds) {
+	function writeMessage(type, x, y, content) {
        /* var context = canvas.getContext('2d');
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.font = '18pt Calibri';
         context.fillStyle = 'black';
         context.fillText(message, 10, 25); */
         
-        document.getElementById('history').innerHTML += '<p onclick="getFocus(id)" tabindex=\"0\" class="historyElement" id=historyElement' + i++ + '>' + type + "\tx: " + x + " y: " + y + "  " + bounds + '<br/></p>';
+        document.getElementById('history').innerHTML += '<p onclick="getFocus(id)" tabindex=\"0\" class="historyElement" id=historyElement' + i++ + '>' + type + "\tx: " + x + " y: " + y + "  " + content + '<br/></p>';
       }
 	
 		function getFocus(elementID){
@@ -111,8 +111,11 @@
 					context.moveTo(x, y);
 					context.lineTo(x2, y2);
 					context.stroke();
-					writeMessage(type, x, y, "EndX: " + x2 + ", EndY: " + y2);
+					
+					var content = JSON.stringify({"startX":x, "startY":y, "endX":x2, "endY":y2});
+					writeMessage(type, x, y, content);
 					loadImage();
+					toDraw(content);
 				}
 				else if(type == "rectangle"){
 					if(x < x2){
@@ -132,8 +135,11 @@
 					}
 					
 					context.strokeRect(a, b, width, height);
-					writeMessage(type, a, b, " width: " + width + " height: " + height);
+					
+					var content = JSON.stringify({"x":a, "y":b, "width":width, "height":height});
+					writeMessage(type, a, b, content);
 					loadImage();
+					toDraw(content);
 				}else if(type == "circle"){
 					width = x2 - x;
 					height = y2 - y;
@@ -141,8 +147,11 @@
 					context.beginPath();
 					context.arc(x, y, radius, 0, 2 * Math.PI);
 					context.stroke();
-					writeMessage(type, x, y, "radius: " + radius);
+					
+					var content = JSON.stringify({"x":x, "y":y, "radius":radius});
+					writeMessage(type, x, y, content);
 					loadImage();
+					toDraw(content);
 				}else if(type == "freeHand"){
 					context.fillRect(x, y, 1, 1);
 					
@@ -250,6 +259,7 @@
 		function onMessage(message){
 			console.log("onMessage()");
 			console.log(message, ": ", message.data);
+			console.log("Type: ", message.data.type);
 			var jsonData = JSON.parse(message.data);
 			console.log(jsonData);
 			if(jsonData != null){
@@ -370,6 +380,11 @@
 					}
 				}
 			}
+		}
+		
+		function toDraw(content){
+			var message = JSON.stringify({"type":type, "content":content}, null, "\t");
+			webSocket.send(message);
 		}
 		
 		function start(){
