@@ -14,6 +14,7 @@ import com.gabrielmeyer.decoder.LineDecoder;
 import com.gabrielmeyer.decoder.MessageDecoder;
 import com.gabrielmeyer.decoder.PolygonDecoder;
 import com.gabrielmeyer.decoder.RectangleDecoder;
+import com.gabrielmeyer.encoder.ArrayEncoder;
 import com.gabrielmeyer.encoder.CircleEncoder;
 import com.gabrielmeyer.encoder.FreeHandEncoder;
 import com.gabrielmeyer.encoder.LineEncoder;
@@ -54,6 +55,7 @@ public class StartUpListener implements ServletContextListener {
 							CircleEncoder.class, //
 							PolygonEncoder.class, //
 							FreeHandEncoder.class, //
+							ArrayEncoder.class, //
 							TextNodeEncoder.class, //
 							NodeEncoder.class))
 					.build();

@@ -63,7 +63,7 @@
 	</div>
 
 	<script>
-	var type = "rectangle";
+	var theType = "rectangle";
 	var typeChat = "rectangle";
 	var i = 0;
 	var history = new Map();
@@ -73,7 +73,7 @@
 	function setType(id){
 		if(id == "polygon")
 			alert("Click five times until the polygon is drawn.");
-		type = id;
+		theType = id;
 	}
 	
 	function setTypeChat(id){
@@ -103,10 +103,16 @@
 			
 		}
 	
-		function onDraw(x, y, x2, y2){
+		function onDraw(x, y, x2, y2, onType, sending){
+			var type = null;
+			if(onType != null){
+				type = onType;
+			}else{
+				type = theType;
+			}
 			var a, b;
 			var width, height;
-			if(context){
+			if(context && type){
 				if(type == "line"){
 					context.moveTo(x, y);
 					context.lineTo(x2, y2);
@@ -115,7 +121,8 @@
 					var content = JSON.stringify({"startX":x, "startY":y, "endX":x2, "endY":y2});
 					writeMessage(type, x, y, content);
 					loadImage();
-					toDraw(content);
+					if(sending)
+						toDraw(content);
 				}
 				else if(type == "rectangle"){
 					if(x < x2){
@@ -139,11 +146,17 @@
 					var content = JSON.stringify({"x":a, "y":b, "width":width, "height":height});
 					writeMessage(type, a, b, content);
 					loadImage();
-					toDraw(content);
+					if(sending)
+						toDraw(content);
 				}else if(type == "circle"){
-					width = x2 - x;
-					height = y2 - y;
-					var radius = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));
+					var radius;
+					if(y2 != null){
+						width = x2 - x;
+						height = y2 - y;
+						radius = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));
+					}else{
+						radius = x2;
+					}
 					context.beginPath();
 					context.arc(x, y, radius, 0, 2 * Math.PI);
 					context.stroke();
@@ -151,7 +164,8 @@
 					var content = JSON.stringify({"x":x, "y":y, "radius":radius});
 					writeMessage(type, x, y, content);
 					loadImage();
-					toDraw(content);
+					if(sending)
+						toDraw(content);
 				}else if(type == "freeHand"){
 					context.fillRect(x, y, 1, 1);
 					
@@ -169,7 +183,8 @@
 					
 					writeMessage(type, 0, 0, "Array: " + polygonPoints.toString());
 					loadImage();
-					
+					if(sending)
+						toDraw(polygonPoints);
 					while(polygonPoints.length > 0){
 						polygonPoints.pop();
 					}
@@ -193,8 +208,8 @@
 		
 		canvas.addEventListener('mousemove', function(evt) {
 	        var mousePos = getMousePos(canvas, evt);
-	        if(isPressing && type == "freeHand"){
-	        	onDraw(mousePos.x, mousePos.y, 0, 0);
+	        if(isPressing && theType == "freeHand"){
+	        	onDraw(mousePos.x, mousePos.y, 0, 0, null, true);
 	        }
 	        var message = 'Mouse position: ' + mousePos.x + ',' + mousePos.y;
 	      }, false);
@@ -205,7 +220,7 @@
 			pointer = getMousePos(canvas, event);
 			var p = getMousePos(canvas, event);
 			
-			if(type == "polygon"){
+			if(theType == "polygon"){
 				polygonPoints.push(p);
 			}
 		}, false);
@@ -218,10 +233,10 @@
 			
 			x2 = pointer2.x;
 			y2 = pointer2.y;
-			if(type != "polygon")
-				onDraw(x, y, x2, y2);
+			if(theType != "polygon")
+				onDraw(x, y, x2, y2, null, true);
 			else if(polygonPoints.length == 5)
-				onDraw(0, 0, 0, 0);
+				onDraw(0, 0, 0, 0, null, true);
 		}, false);
 		
 		
@@ -261,10 +276,23 @@
 			console.log(message, ": ", message.data);
 			console.log("Type: ", message.data.type);
 			var jsonData = JSON.parse(message.data);
-			console.log(jsonData);
+			console.log("jsonData: ", jsonData);
 			if(jsonData != null){
-				if(jsonData.type == "canvas"){
-					
+				if(jsonData.type == "line"){
+					console.log("line", jsonData);
+					onDraw(jsonData.startX, jsonData.startY, jsonData.endX, jsonData.endY, "line", false);
+				}else if(jsonData.type == "rectangle"){
+					console.log("rectangle", jsonData);	
+					onDraw(jsonData.x, jsonData.y, (jsonData.x + jsonData.width), (jsonData.y + jsonData.height), "rectangle", false);
+				}else if(jsonData.type == "circle"){
+					console.log("circle", jsonData);	
+					onDraw(jsonData.x, jsonData.y, jsonData.radius, null, "circle", false);
+				}else if(jsonData.type == "polygon"){
+					console.log("polygon", jsonData);
+					this.polygonPoints = jsonData.content;
+					onDraw(0, 0, 0, 0, "polygon", false);
+				}else if(jsonData.type == "freeHand"){
+					console.log("freeHand", jsonData);	
 				}else if(jsonData.type == "chat"){
 				//messagesTextArea.value += jsonData.username + ": " + jsonData.message + "\n";
 				//messagesTextArea.value += "<img src=\"" + jsonData.imageURL + "\" width=\"100\" height=\"100\" />\n";	
@@ -383,7 +411,7 @@
 		}
 		
 		function toDraw(content){
-			var message = JSON.stringify({"type":type, "content":content}, null, "\t");
+			var message = JSON.stringify({"type":theType, "content":content}, null, "\t");
 			webSocket.send(message);
 		}
 		

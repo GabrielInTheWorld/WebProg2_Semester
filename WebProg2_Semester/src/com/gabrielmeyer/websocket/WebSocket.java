@@ -2,6 +2,7 @@ package com.gabrielmeyer.websocket;
 
 import java.awt.Point;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -18,6 +19,7 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -61,6 +63,14 @@ public class WebSocket {
 
 		public String getImageURL() {
 			return imageURL;
+		}
+
+		public String getType() {
+			return type;
+		}
+
+		public void setType(String type) {
+			this.type = type;
 		}
 
 		public String asText() {
@@ -379,11 +389,30 @@ public class WebSocket {
 					iterator.next().getBasicRemote().sendObject(buildJsonData(circle));
 				}
 			} else if ("polygon".equals(type)) {
-				Polygon polygon = mapper.readValue(toParse, Polygon.class);
+				List<Point> polygonPoints = new ArrayList<>();
+				try {
+					JSONArray array = new JSONArray(toParse);
+					for (int i = 0; i < array.length(); ++i) {
+						JSONObject object = array.getJSONObject(i);
+						int x = object.getInt("x");
+						int y = object.getInt("y");
+						polygonPoints.add(new Point(x, y));
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				// Polygon polygon = mapper.readValue(toParse, Polygon.class);
+				Polygon polygon = new Polygon(polygonPoints);
 
 				polygon.setType(type);
-				while (iterator.hasNext()) {
-					iterator.next().getBasicRemote().sendObject(buildJsonData(polygon));
+
+				try {
+					while (iterator.hasNext()) {
+						iterator.next().getBasicRemote().sendObject(buildJsonData(polygon));
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.out.println("etwas ist schief gegangen");
 				}
 			} else if ("freeHand".equals(type)) {
 				FreeHand freeHand = mapper.readValue(toParse, FreeHand.class);
@@ -424,6 +453,7 @@ public class WebSocket {
 		ObjectMapper mapper = new ObjectMapper();
 
 		MessageNode node = new MessageNode(username, message, imageURL);
+		node.setType("chat");
 		JsonNode json = null;
 		try {
 			json = mapper.valueToTree(node);
@@ -442,7 +472,7 @@ public class WebSocket {
 	 * @param objectToDraw
 	 * @return JSON object for JavaScript
 	 */
-	private Object buildJsonData(Object objectToDraw) {
+	private Object buildJsonData(Line objectToDraw) {
 		ObjectMapper mapper = new ObjectMapper();
 
 		JsonNode json = null;
@@ -450,7 +480,94 @@ public class WebSocket {
 			String jsonString = mapper.writeValueAsString(objectToDraw);
 			System.out.println("jsonString: " + jsonString);
 
-			json = mapper.valueToTree(jsonString);
+			json = mapper.valueToTree(objectToDraw);
+
+			// json = mapper.valueToTree(jsonString);
+			// json = jsonString;
+			System.out.println("json when send: " + json);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return json;
+	}
+
+	private Object buildJsonData(Rectangle objectToDraw) {
+		ObjectMapper mapper = new ObjectMapper();
+
+		JsonNode json = null;
+		try {
+			json = mapper.valueToTree(objectToDraw);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return json;
+	}
+
+	private Object buildJsonData(Circle objectToDraw) {
+		ObjectMapper mapper = new ObjectMapper();
+
+		JsonNode json = null;
+		try {
+			json = mapper.valueToTree(objectToDraw);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return json;
+	}
+
+	private Object buildJsonData(Polygon objectToDraw) {
+		// ObjectMapper mapper = new ObjectMapper();
+		List<Point> list = objectToDraw.getPolygonPoints();
+		JSONArray array = new JSONArray();
+		JSONObject o = new JSONObject();
+		try {
+			o.put("type", objectToDraw.getType());
+			// array.put(o);
+			for (Point p : list) {
+				JSONObject object = new JSONObject();
+				object.put("x", p.getX());
+				object.put("y", p.getY());
+
+				array.put(object);
+				// JsonNode node = mapper.valueToTree(p);
+				System.out.println("Node: " + object);
+			}
+			o.put("content", array);
+			System.out.println("Array: " + array);
+			System.out.println("Object o: " + o);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		// OutputStream out = new ByteArrayOutputStream();
+		// ObjectMapper mapper = new ObjectMapper();
+		//
+		// try {
+		// mapper.writeValue(out, list);
+		// } catch (IOException e1) {
+		// e1.printStackTrace();
+		// }
+
+		// JsonNode json = null;
+		// // final byte[] data = out.toByteArray();
+		// try {
+		// json = mapper.valueToTree(objectToDraw);
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
+		//
+		// return json;
+		return o;
+	}
+
+	private Object buildJsonData(FreeHand objectToDraw) {
+		ObjectMapper mapper = new ObjectMapper();
+
+		JsonNode json = null;
+		try {
+			json = mapper.valueToTree(objectToDraw);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
