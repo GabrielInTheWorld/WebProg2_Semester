@@ -8,6 +8,10 @@
 
 <body>
 
+<div class="header">
+	some content
+</div>
+
 <div id="mainDiv">
 <div id="leftSite">
 
@@ -17,7 +21,7 @@
 		<div id="chatBox" ></div>
 	</div> 
 	<div>
-		<div id="chatCanvasDiv"><canvas id="chatCanvas" width="300" height="300"></canvas></div>
+		<div id="chatCanvasDiv"><canvas id="chatCanvas" width="250" height="250"></canvas></div>
 		<div class="vertical">
 				<button type="button" id="line" onclick="setTypeChat(id)"></button>
 				<button type="button" id="rectangle" onclick="setTypeChat(id)"></button>
@@ -41,6 +45,12 @@
 				<button type="button" id="circle" onclick="setType(id)"></button>
 				<button type="button" id="polygon" onclick="setType(id)"></button>
 				<button type="button" id="freeHand" onclick="setType(id)"></button>
+				<button type="button" id="deleteAll" onclick="clearHistory()"></button>
+				<button type="button" id="deleteOne" onclick="removeFromHistory()"></button>
+				<button type="button" id="animate" onclick="animate()"></button>
+				<a id="downloadAnchorElem" class="aButton" onclick="save()"></a>
+<!-- 			<button type="submit" id="saveImage" onclick="save()"></button> -->
+
 		</div>
 		</form>
 		<canvas class="center" id="canvas" width="800" height="500"></canvas>
@@ -49,7 +59,7 @@
 	<div class="rightSite">
 			<form>
 		<div >
-			<img id="canvasImg" width="300" height="300" alt="Right click to save me!">
+			<img id="canvasImg" width="300" height="250" alt="Right click to save me!">
 			<div id="history">
 			
 			</div>
@@ -61,19 +71,29 @@
 	</div>
 	
 	</div>
+	
+<div class="footer">
+	behind next door
+</div>
 
 	<script>
 	var theType = "rectangle";
 	var typeChat = "rectangle";
 	var i = 0;
-	var history = new Map();
+	var historyMap = new Map();
 	var polygonPoints = [];
 	var polygonPointsOnChat = [];
+	var idToDelete = null;
+	
+	function animate(){
+		console.log("animate()");
+	}
 	
 	function setType(id){
 		if(id == "polygon")
 			alert("Click five times until the polygon is drawn.");
 		theType = id;
+		//document.getElementById(id).focus();
 	}
 	
 	function setTypeChat(id){
@@ -94,13 +114,26 @@
         context.fillStyle = 'black';
         context.fillText(message, 10, 25); */
         
-        document.getElementById('history').innerHTML += '<p onclick="getFocus(id)" tabindex=\"0\" class="historyElement" id=historyElement' + i++ + '>' + type + "\tx: " + x + " y: " + y + "  " + content + '<br/></p>';
+        var id = "historyElement" + i++;
+        //document.getElementById('history').innerHTML += '<p onclick="getFocus(id)" tabindex=\"0\" class="historyElement" id=' + id + '>' + content + '<br/></p>';
+        var para = document.createElement("p");
+        para.setAttribute("id", id);
+        para.setAttribute("onclick", "getFocus(id)");
+        para.setAttribute("tabindex","0");
+        para.setAttribute("class", "historyElement");
+      //  var node = document.createTextNode("onclick=\"getFocus(id)\" tabindex=\"0\" class=\"historyElement\" id=" + id);
+        var node = document.createTextNode(content);
+        para.appendChild(node);
+        
+        var element = document.getElementById("history");
+        element.appendChild(para);
+      	toHistory(id, content);
       }
 	
 		function getFocus(elementID){
 			console.log("elementID: ", elementID);
 			document.getElementById(elementID).focus();
-			
+			idToDelete = elementID;
 		}
 	
 		function onDraw(x, y, x2, y2, onType, sending){
@@ -114,15 +147,18 @@
 			var width, height;
 			if(context && type){
 				if(type == "line"){
+					context.beginPath();
 					context.moveTo(x, y);
 					context.lineTo(x2, y2);
+					context.closePath();
 					context.stroke();
 					
-					var content = JSON.stringify({"startX":x, "startY":y, "endX":x2, "endY":y2});
-					writeMessage(type, x, y, content);
+					var content = JSON.stringify({"type":type, "startX":x, "startY":y, "endX":x2, "endY":y2});
 					loadImage();
-					if(sending)
+					if(sending){
+						writeMessage(type, x, y, content);
 						toDraw(content);
+					}
 				}
 				else if(type == "rectangle"){
 					if(x < x2){
@@ -143,11 +179,12 @@
 					
 					context.strokeRect(a, b, width, height);
 					
-					var content = JSON.stringify({"x":a, "y":b, "width":width, "height":height});
-					writeMessage(type, a, b, content);
+					var content = JSON.stringify({"type":type, "x":a, "y":b, "width":width, "height":height});
 					loadImage();
-					if(sending)
+					if(sending){
 						toDraw(content);
+						writeMessage(type, a, b, content);
+					}
 				}else if(type == "circle"){
 					var radius;
 					if(y2 != null){
@@ -159,13 +196,15 @@
 					}
 					context.beginPath();
 					context.arc(x, y, radius, 0, 2 * Math.PI);
+					context.closePath();
 					context.stroke();
 					
-					var content = JSON.stringify({"x":x, "y":y, "radius":radius});
-					writeMessage(type, x, y, content);
+					var content = JSON.stringify({"type":type, "x":x, "y":y, "radius":radius});
 					loadImage();
-					if(sending)
+					if(sending){
+						writeMessage(type, x, y, content);
 						toDraw(content);
+					}
 				}else if(type == "freeHand"){
 					context.fillRect(x, y, 1, 1);
 					
@@ -181,10 +220,11 @@
 					context.closePath();
 					context.stroke();
 					
-					writeMessage(type, 0, 0, "Array: " + polygonPoints.toString());
 					loadImage();
-					if(sending)
+					if(sending){
+						writeMessage(type, 0, 0, "Array: " + polygonPoints.toString());
 						toDraw(polygonPoints);
+					}
 					while(polygonPoints.length > 0){
 						polygonPoints.pop();
 					}
@@ -209,6 +249,7 @@
 		canvas.addEventListener('mousemove', function(evt) {
 	        var mousePos = getMousePos(canvas, evt);
 	        if(isPressing && theType == "freeHand"){
+	        	this.style.cursor='pointer';
 	        	onDraw(mousePos.x, mousePos.y, 0, 0, null, true);
 	        }
 	        var message = 'Mouse position: ' + mousePos.x + ',' + mousePos.y;
@@ -251,7 +292,6 @@
 		uri += loc.host + loc.pathname;
 		uri += "websocket";
 		console.log("uri", uri);
-		//uri = ws://localhost:8080/WebProg2_Semester/websocket;
 		var webSocket = new WebSocket(
 			uri
 				//	"ws://195.37.110.152:8080/WebProg2_Semester/websocket"
@@ -354,8 +394,10 @@
 			var width, height;
 			if(context){
 				if(typeChat == "line"){
+					context.beginPath();
 					context.moveTo(x, y);
 					context.lineTo(x2, y2);
+					context.closePath();
 					context.stroke();
 		//			writeMessage(type, x, y, "EndX: " + x2 + ", EndY: " + y2);
 				}
@@ -385,6 +427,7 @@
 					var radius = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));
 					context.beginPath();
 					context.arc(x, y, radius, 0, 2 * Math.PI);
+					context.closePath();
 					context.stroke();
 			//		writeMessage(type, x, y, "radius: " + radius);
 			//		loadImage();
@@ -410,20 +453,94 @@
 			}
 		}
 		
+		function toHistory(id, content){
+			historyMap.set(id, content);
+		}
+		
+		function removeFromHistory(){
+			historyMap.delete(idToDelete);
+			
+			var parent = document.getElementById('history');
+			var child = document.getElementById(idToDelete);
+			console.log("child which will destroyed: ", child);
+			parent.removeChild(child);
+			
+			drawFromHistory();
+			
+			idToDelete = null;
+			loadImage();
+		}
+		
+		function clearHistory(){
+			var parent = document.getElementById("history");
+			historyMap.forEach(function(value, key, historyMap) {
+				historyMap.delete(key);
+				var child = document.getElementById(key);
+				parent.removeChild(child);
+			});
+			console.log("historyLength: ", historyMap.size);
+			context.clearRect(0, 0, canvas.width, canvas.height);
+			loadImage();
+		}
+		
+		function drawFromHistory(){
+			context.clearRect(0, 0, canvas.width, canvas.height);
+			
+			historyMap.forEach(function(value, key, map) {
+				var content = JSON.parse(value);
+				console.log("value: ", content);
+				afterDelete(content);
+			})
+		}
+		
+		function afterDelete(content){
+			console.log("get from history: ", content);
+			
+			if(content.type == "line"){
+				context.beginPath();
+				context.moveTo(content.startX, content.startY);
+				context.lineTo(content.endX, content.endY);
+				context.closePath();
+				context.stroke();
+			}else if(content.type == "rectangle"){
+				context.strokeRect(content.x, content.y, content.width, content.height);
+			}else if(content.type == "circle"){
+				context.beginPath();
+				context.arc(content.x, content.y, content.radius, 0, 2 * Math.PI);
+				context.closePath();
+				context.stroke();
+			}else if(content.type == "polygon"){
+				
+			}
+		}
+		
 		function toDraw(content){
 			var message = JSON.stringify({"type":theType, "content":content}, null, "\t");
 			webSocket.send(message);
+		}
+		
+		function save(){
+		/*	var img = canvas.toDataURL();
+			var url = img.src.replace(/^data:image\/[^;]/, 'data:application/octet-stream');
+			window.open(url);*/
+			var historyToD = JSON.stringify(historyMap);
+			console.log("save(): ", historyToD);
+			var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(historyToD);
+			var dlAnchorElem = document.getElementById('downloadAnchorElem');
+			dlAnchorElem.setAttribute("href", dataStr);
+			dlAnchorElem.setAttribute("download", "scene.json");
+			//dlAnchorElem.click();
 		}
 		
 		function start(){
 			var user = document.getElementById("username").value;
 			var text = document.getElementById("userinput").value;
 			var dataURL = canvasChat.toDataURL();
-			//var message = "{\"username\":" + "\"" + user + "\",\"message\":\"" + text + "\"}";
+			
 			var content = JSON.stringify({"username":user, "message":text, "imageURL":dataURL}, null, "\t");
-			//var content = JSON.parse()
-			//var message = JSON.stringify({"type":"chat","username":user, "message":text, "imageURL":dataURL}, null, "\t");
+			console.log("content: ", content);
 			var c = JSON.parse(content);
+			console.log("geparsed: ", c);
 			var message = JSON.stringify({"type":"chat", "content":c}, null, "\t");
 			webSocket.send(message);
 			
@@ -433,7 +550,7 @@
 			onClearChat(canvasChat.width, canvasChat.height, contextChat);
 		}
 	</script>
-	
-	
+
 </body>
+
 </html>

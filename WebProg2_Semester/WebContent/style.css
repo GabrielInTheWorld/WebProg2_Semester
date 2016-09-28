@@ -1,11 +1,53 @@
 @CHARSET "ISO-8859-1";
 
+.header, .footer{
+	width: 100%;
+	height: 64px;
+	text-align: center;
+	background-color: #63C9E9;
+	border: 2px solid #222;
+}
+
+.header:hover, .footer:hover{
+	background-color: #231E64;
+	transition: background-color 1s ease-in;
+}
+
+.header{
+	padding-bottom: 10px;	
+}
+
+.header:hover{
+	border: 2px solid #FFF;
+	transition: background-color 1s ease-in, border 1s ease-in-out;
+}
+
+.footer{
+	float: left;
+	height: 20px;
+}
+
+.footer:hover{
+	color: #FFF;
+	border: 2px solid #FFF;
+	height: 74px;
+	transition: height 1s ease-out, background-color 1s ease-in, color 1s ease-in-out, border 1s ease-in-out;
+}
+
+#mainDiv{
+	margin-top: 20px;
+	/*background: linear-gradient(to top, #49BCE6, #231E64);*/
+}
+
 body{
 	position: relative;
+	background: linear-gradient(to top, #49BCE6, #231E64);
 }
 
 #canvas{
 	position: relative;
+	background-color: #FFF;
+	box-shadow: 5px 5px 10px #333;
 }
 
 .canvasDiv{
@@ -31,6 +73,7 @@ body{
 #chatCanvasDiv{
 	float: left;
 	box-sizing: border-box;
+	background-color: #FFF;
 }
 
 .vertical{
@@ -42,6 +85,7 @@ body{
 #leftSite{
 	margin-right: 2%;
 	padding: 20px;
+	padding-top: 0px;
 	width: auto;
 	float: left;
 	box-sizing: border-box;
@@ -55,7 +99,7 @@ body{
 }
 
 #canvasImg{
-
+	background-color: #FFF;
 }
 
 #history{
@@ -63,6 +107,8 @@ body{
 	height: 500px;
 	width: 300px;
 	overflow: auto;
+	margin-bottom: 20px;
+	background-color: #FFF;
 }
 
 .historyElement{
@@ -92,10 +138,11 @@ body{
 }
 
 #chatBox{
-	width: 300px;
-	height: 500px;
+	width: 250px;
+	height: 380px;
 	overflow: auto;
 	border: 1px solid #220099;
+	background-color: #FFF;
 	/*resize: none;*/
 }
 
@@ -108,32 +155,85 @@ body{
 Buttons
 */
 button{
+	cursor: pointer;	
 	width: 64px;
 	height: 54px;
 	background-repeat: no-repeat;
 	background-position: 50%;
+	background-color: #FFF;
+}
+
+button:hover{
+	background-color: #7a9dfa;
+}
+
+button:active{
+	background-color: #231E64;
+}
+
+button:focus{
+	background-color: #23164;
 }
 
 #line{
-	background-image: url("./images/line_filled.png");
+	background-image: url("./images/line_transparent.png");
 }
 
 #rectangle{
-	background-image: url("./images/Rectangle_filled.png");
+	background-image: url("./images/Rectangle_transparent.png");
 }
 
 #circle{
-	background-image: url("./images/circle_filled.png");
+	background-image: url("./images/circle_transparent.png");
 }
 
 #freeHand{
-	background-image: url("./images/freeHand_filled.png");
+	background-image: url("./images/freeHand_transparent.png");
 }
 
 #polygon{
-	background-image: url("./images/Polygon_filled.png");
+	background-image: url("./images/Polygon_transparent.png");
 }
 
 #saveImage{
-	
+	background-image: url("./images/saveImage_transparent.png");
+}
+
+#deleteAll{
+	background-image: url("./images/clear_transparent.png");
+}
+
+#deleteOne{
+	background-image: url("./images/delete_button_transparent.png");
+}
+
+#downloadAnchorElem{
+  font: bold 11px Arial;
+  text-decoration: none;
+  background-color: #FFF;
+  background-image: url("./images/saveImage_transparent.png");
+  background-repeat: no-repeat;
+  background-position: 50%;
+  color: #333333;
+  padding-top: 40px;
+  padding-bottom: 0px;
+  padding-right: 64px;
+  border-top: 1px solid #CCCCCC;
+  border-right: 1px solid #333333;
+  border-bottom: 1px solid #333333;
+  border-left: 1px solid #CCCCCC;
+}
+
+#downloadAnchorElem:hover{
+	cursor: pointer;
+	background-color: #7a9dfa;
+}
+
+#animate{
+	background-image: url("./images/animated_a_transparent.png");
+}
+
+#animate:hover{
+	background-image: url("./images/animated_b_transparent.png");
+	transition: background-image 1s ease-in-out;
 }
